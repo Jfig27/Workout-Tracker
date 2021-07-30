@@ -1,35 +1,54 @@
 const router = require("express").Router();
-const Transaction = require("../models/transaction.js");
+const Workout = require("../models/index.js");
 
-router.post("/api/transaction", ({ body }, res) => {
-  Transaction.create(body)
-    .then(dbTransaction => {
-      res.json(dbTransaction);
+router.post("/api/Workout", ({ body }, res) => {
+  Workout.create(body)
+    .then(dbWorkout => {
+      res.json(dbWorkout);
     })
     .catch(err => {
       res.status(400).json(err);
     });
 });
 
-router.post("/api/transaction/bulk", ({ body }, res) => {
-  Transaction.insertMany(body)
-    .then(dbTransaction => {
-      res.json(dbTransaction);
+router.put("/api/Workout/:id", (req, res) => {
+  Workout.updateOne({ "_id": req.params.id }, {"$push": {exercises: req.body}})
+    .then(dbWorkout => {
+      res.json(dbWorkout);
     })
     .catch(err => {
       res.status(400).json(err);
     });
 });
 
-router.get("/api/transaction", (req, res) => {
-  Transaction.find({})
-    .sort({ date: -1 })
-    .then(dbTransaction => {
-      res.json(dbTransaction);
+router.get("/api/Workout", (req, res) => {
+  Workout.find({})
+    // .sort({ date: -1 })
+    .then(dbWorkout => {
+      res.json(dbWorkout);
     })
     .catch(err => {
       res.status(400).json(err);
     });
 });
+
+router.get("/api/Workout/range", (req, res) => {
+    Workout.find(
+        {
+            day: 
+            {
+                $gte: new Date((new Date().getTime() - (8 * 24 * 60 * 60 * 1000)))
+            }
+        }
+        ).sort({ "date": -1 }
+    )
+    .then((dbWorkout) => {
+        res.json(dbWorkout);
+    })
+    .catch(err => {
+        res.status(400).json(err);
+    });
+})
+
 
 module.exports = router;
