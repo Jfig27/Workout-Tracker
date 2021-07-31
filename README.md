@@ -19,6 +19,7 @@ If running locally..
 A consumer will reach their fitness goals more quickly when they track their workout progress.
 
 ## Deployed link
+https://workout-apperino.herokuapp.com/
 
 ## Screenshot
 ![homepage](./assets/home.png)
