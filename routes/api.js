@@ -1,54 +1,63 @@
 const router = require("express").Router();
-const Workout = require("../models/index.js");
+const Workout = require("../models/workout.js");
+const mongoose = require("mongoose");
 
-router.post("/api/Workout", ({ body }, res) => {
-  Workout.create(body)
-    .then(dbWorkout => {
-      res.json(dbWorkout);
-    })
-    .catch(err => {
-      res.status(400).json(err);
-    });
-});
-
-router.put("/api/Workout/:id", (req, res) => {
-  Workout.updateOne({ "_id": req.params.id }, {"$push": {exercises: req.body}})
-    .then(dbWorkout => {
-      res.json(dbWorkout);
-    })
-    .catch(err => {
-      res.status(400).json(err);
-    });
-});
-
-router.get("/api/Workout", (req, res) => {
-  Workout.find({})
-    // .sort({ date: -1 })
-    .then(dbWorkout => {
-      res.json(dbWorkout);
-    })
-    .catch(err => {
-      res.status(400).json(err);
-    });
-});
-
-router.get("/api/Workout/range", (req, res) => {
-    Workout.find(
-        {
-            day: 
-            {
-                $gte: new Date((new Date().getTime() - (8 * 24 * 60 * 60 * 1000)))
-            }
-        }
-        ).sort({ "date": -1 }
-    )
-    .then((dbWorkout) => {
+router.post("/api/workouts", ({ body }, res) => {
+    Workout.create(body)
+      .then(dbWorkout => {
         res.json(dbWorkout);
-    })
-    .catch(err => {
+      })
+      .catch(err => {
         res.status(400).json(err);
-    });
-})
-
+      });
+  });
+  
+  router.post("/api/workouts/bulk", ({ body }, res) => {
+    Workout.insertMany(body)
+      .then(dbWorkout => {
+        res.json(dbWorkout);
+      })
+      .catch(err => {
+        res.status(400).json(err);
+      });
+  });
+  
+  router.put("/api/workouts/:id", ({ params, body }, res) => {
+    console.log("PARAMS", body, params);
+  
+    Workout.findOneAndUpdate(
+      { _id: params.id },
+      { $push: { exercises: body } },
+      { new: true }
+    )
+      .then((dbWorkout) => {
+        res.json(dbWorkout);
+      })
+      .catch((err) => {
+        res.json(err);
+      });
+  });
+  
+  router.get("/api/workouts", (req, res) => {
+    Workout.find({})
+      .sort({ date: -1 })
+      .then(dbWorkout => {
+        res.json(dbWorkout);
+      })
+      .catch(err => {
+        res.status(400).json(err);
+      });
+  });
+  
+  router.get("/api/workouts/range", (req, res) => {
+    Workout.find({})
+      .limit(7)
+      .then((dbWorkout) => {
+        res.json(dbWorkout);
+      })
+      .catch((err) => {
+        res.json(err);
+      });
+  });
 
 module.exports = router;
